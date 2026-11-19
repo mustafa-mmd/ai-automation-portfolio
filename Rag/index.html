@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personal CV Chatbot Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-[#0b0d13] text-gray-100 flex flex-col h-screen font-sans selection:bg-cyan-500/30"
+  >
+    <header
+      class="p-4 bg-[#111420] border-b border-gray-800 flex items-center justify-between px-6 shadow-xl"
+    >
+      <div class="flex items-center space-x-3">
+        <div
+          class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]"
+        ></div>
+        <h1
+          class="text-sm font-bold uppercase tracking-widest bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent"
+        >
+          Mustafa Jamal Personal ChatBot!
+        </h1>
+      </div>
+      <span
+        class="text-[10px] font-mono text-cyan-400/60 border border-cyan-500/20 bg-cyan-500/5 px-2 py-0.5 rounded"
+      >
+        Bi-Directional Input Enabled
+      </span>
+    </header>
+
+    <main
+      id="chat"
+      class="flex-1 p-6 overflow-y-auto space-y-6 max-w-3xl w-full mx-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent"
+    ></main>
+
+    <footer class="p-4 bg-[#111420] border-t border-gray-800">
+      <div class="max-w-3xl w-full mx-auto flex flex-col gap-2">
+        <form
+          id="form"
+          class="flex items-center gap-3 bg-[#07080c] border border-gray-800 focus-within:border-cyan-500/50 p-2 rounded-xl transition-all duration-300"
+        >
+          <button
+            type="button"
+            id="mic-btn"
+            class="p-2.5 rounded-lg text-gray-500 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all active:scale-90 relative group"
+            title="Speak to Voice Transcribe"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="w-5 h-5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 0 3-3V4.5a3 3 0 0 0-6 0v8.25a3 3 0 0 0 3 3Z"
+              />
+            </svg>
+            <span
+              id="mic-aura"
+              class="absolute inset-0 rounded-lg bg-red-500/20 hidden animate-ping"
+            ></span>
+          </button>
+
+          <input
+            id="input"
+            type="text"
+            autocomplete="off"
+            placeholder="Ask about my professional experience or projects..."
+            class="flex-1 bg-transparent border-none outline-none text-sm text-gray-200 placeholder-gray-600 px-1"
+          />
+
+          <button
+            type="submit"
+            class="bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-lg transition-all active:scale-95 shadow-md"
+          >
+            Send
+          </button>
+        </form>
+
+        <div
+          id="status-text"
+          class="text-[10px] font-mono text-gray-600 px-2 transition-all"
+        ></div>
+      </div>
+    </footer>
+
+    <script>
+      const form = document.getElementById("form");
+      const input = document.getElementById("input");
+      const chat = document.getElementById("chat");
+      const micBtn = document.getElementById("mic-btn");
+      const micAura = document.getElementById("mic-aura");
+      const statusText = document.getElementById("status-text");
+
+      window.onload = () => {
+        chat.innerHTML += `
+                <div class="flex justify-start animate-fade-in">
+                    <div class="bg-[#161a26] border border-gray-800/60 p-4 rounded-2xl rounded-tl-none max-w-md text-sm text-gray-300 shadow-lg">
+                        👋 Welcome to Mustafa Jamal Personal Assistant! Feel free to type your questions, or click the 🎙️ microphone icon to ask with your voice.
+                    </div>
+                </div>`;
+      };
+
+      // ==========================================
+      // 🎙️ SPEECH-TO-TEXT VOICE INTEGRATION
+      // ==========================================
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false; // Stop recording automatically when user pauses speaking
+        recognition.lang = "en-US";
+        recognition.interimResults = false;
+
+        micBtn.onclick = () => {
+          try {
+            recognition.start();
+          } catch (e) {
+            recognition.stop(); // Toggle off if clicked while running
+          }
+        };
+
+        recognition.onstart = () => {
+          micBtn.classList.add("text-red-500", "hover:text-red-400");
+          micAura.classList.remove("hidden");
+          statusText.innerText =
+            "Listening... Speak directly into your microphone.";
+          statusText.classList.add("text-red-400");
+        };
+
+        recognition.onend = () => {
+          micBtn.classList.remove("text-red-500", "hover:text-red-400");
+          micAura.classList.add("hidden");
+          statusText.innerText = "";
+          statusText.classList.remove("text-red-400");
+        };
+
+        recognition.onresult = (event) => {
+          const vocalTranscript = event.results[0][0].transcript;
+          input.value = vocalTranscript;
+          statusText.innerText = "Speech translated successfully.";
+          setTimeout(() => (statusText.innerText = ""), 2000);
+        };
+
+        recognition.onerror = (event) => {
+          console.error("Vocal Engine Error:", event.error);
+          statusText.innerText = `Voice Error: ${event.error}`;
+        };
+      } else {
+        // Gracefully hide the UI element if browser architecture cuts access
+        micBtn.style.display = "none";
+      }
+
+      // ==========================================
+      // 💬 USER CONTEXT ROUTING & LIVE SPINNER
+      // ==========================================
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+        const queryMessage = input.value.trim();
+        if (!queryMessage) return;
+
+        // Append User Question
+        chat.innerHTML += `
+                <div class="flex justify-end animate-fade-in">
+                    <div class="bg-gradient-to-br from-indigo-600 to-indigo-700 p-4 rounded-2xl rounded-tr-none max-w-md text-sm text-white shadow-md">
+                        ${queryMessage}
+                    </div>
+                </div>`;
+
+        input.value = "";
+        chat.scrollTop = chat.scrollHeight;
+
+        // Generate an isolated, identifiable ID for this specific execution spinner
+        const activeLoaderId = "spinner-" + Date.now();
+
+        // Render the Glowing Premium Spinner
+        chat.innerHTML += `
+                <div id="${activeLoaderId}" class="flex justify-start items-center space-x-3 animate-fade-in">
+                    <div class="bg-[#161a26] border border-gray-800/60 p-4 rounded-2xl rounded-tl-none flex items-center space-x-3 shadow-md">
+                        <svg class="animate-spin h-5 w-5 text-cyan-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-xs font-mono text-cyan-400/80 tracking-wide">AI processing context...</span>
+                    </div>
+                </div>`;
+        chat.scrollTop = chat.scrollHeight;
+
+        try {
+          // Execute network fetch to your local Node Express router
+          const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: queryMessage }),
+          });
+          const data = await res.json();
+
+          // 💥 TARGETED REMOVAL: Wipe out the exact spinner the millisecond the payload returns
+          document.getElementById(activeLoaderId).remove();
+
+          // Render the finalized AI payload
+          chat.innerHTML += `
+                    <div class="flex justify-start animate-fade-in">
+                        <div class="bg-[#161a26] border border-gray-800/60 p-4 rounded-2xl rounded-tl-none max-w-xl text-sm text-gray-200 leading-relaxed shadow-lg">
+                            <div class="text-[9px] font-mono uppercase tracking-widest text-cyan-400/50 mb-1.5">Grounded Answer</div>
+                            ${data.response}
+                        </div>
+                    </div>`;
+        } catch (err) {
+          document.getElementById(activeLoaderId).remove();
+          chat.innerHTML += `
+                    <div class="flex justify-start animate-fade-in">
+                        <div class="bg-red-950/30 border border-red-900/50 p-4 rounded-2xl rounded-tl-none max-w-md text-sm text-red-400">
+                            ❌ Pipeline execution dropped. Ensure 'node query.js' is running in your terminal.
+                        </div>
+                    </div>`;
+        }
+        chat.scrollTop = chat.scrollHeight;
+      };
+    </script>
+  </body>
+</html>

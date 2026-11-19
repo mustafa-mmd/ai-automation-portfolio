@@ -1,0 +1,15 @@
+[submodule "AI-Recruitment-Filter"]
+	path = AI-Recruitment-Filter
+	url = https://github.com/farzeen-ali/AI-Recruitment-Filter.git
+[submodule "AI-Smart-Contact-Form"]
+	path = AI-Smart-Contact-Form
+	url = https://github.com/farzeen-ali/AI-Smart-Contact-Form.git
+[submodule "QuickBill-AI-Whatsapp-Agent"]
+	path = QuickBill-AI-Whatsapp-Agent
+	url = https://github.com/farzeen-ali/QuickBill-AI-Whatsapp-Agent.git
+[submodule "Voice-Assistant-n8n"]
+	path = Voice-Assistant-n8n
+	url = https://github.com/farzeen-ali/Voice-Assistant-n8n.git
+[submodule "n8n-Human-in-the-Loop-Automation"]
+	path = n8n-Human-in-the-Loop-Automation
+	url = https://github.com/farzeen-ali/n8n-Human-in-the-Loop-Automation.git
